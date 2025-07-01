@@ -1,9 +1,25 @@
-import { UserButton } from "@clerk/nextjs";
+"use client";
 
-export default function Home() {
+import { useGetAccounts } from "@/features/accounts/use-get-accounts";
+
+export default function Home(){
+  const {data: accounts, isLoading} = useGetAccounts();
+
+  if(isLoading) {
+    return (
+      <div>
+        Loading...
+      </div>
+    )
+  }
+
   return (
     <div>
-      Dashboard Page
+      {accounts?.map((account) => (
+        <div key={account.id}>
+          {account.name}
+        </div>
+      ))}
     </div>
   );
-}
+};
