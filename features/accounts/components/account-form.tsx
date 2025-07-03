@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,9 +17,9 @@ import {
 
 const formSchema = z.object({
     name: z.string().min(1, "Name is required"),
-  });
+});
 
-type FormValues = z.input<typeof formSchema>;
+type FormValues = z.infer<typeof formSchema>;
 
 type Props = {
     id?: string;
@@ -37,16 +38,25 @@ export const AccountForm = ({
 }: Props) => {
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
-        defaultValues: defaultValues,
+        defaultValues: {
+            name: "", // initial default to avoid uncontrolled warning
+        },
     });
 
+    // Reset form once defaultValues are available
+    useEffect(() => {
+        if (defaultValues) {
+            form.reset(defaultValues);
+        }
+    }, [defaultValues, form]);
+
     const handleSubmit = (values: FormValues) => {
-        onSubmit( values );
+        onSubmit(values);
     };
 
     const handleDelete = () => {
         onDelete?.();
-    }
+    };
 
     return (
         <Form {...form}>
@@ -59,9 +69,7 @@ export const AccountForm = ({
                     control={form.control}
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>
-                                Name
-                            </FormLabel>
+                            <FormLabel>Name</FormLabel>
                             <FormControl>
                                 <Input
                                     disabled={disabled}
@@ -69,6 +77,7 @@ export const AccountForm = ({
                                     {...field}
                                 />
                             </FormControl>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
@@ -81,11 +90,10 @@ export const AccountForm = ({
                         disabled={disabled}
                         onClick={handleDelete}
                         className="w-full"
-                        size="icon"
                         variant="outline"
-                        >
-                            <Trash className="size-4 mr-2" />
-                            Delete account
+                    >
+                        <Trash className="size-4 mr-2" />
+                        Delete account
                     </Button>
                 )}
             </form>
