@@ -3,7 +3,7 @@ import { Trash } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Select } from "@/components/ui/select";
+import { Select } from "@/components/select";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/date-picker";
 import { AmountInput } from "@/components/amount-input";
