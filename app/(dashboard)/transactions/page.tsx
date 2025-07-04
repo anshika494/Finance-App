@@ -1,14 +1,15 @@
 "use client";
 
-import { useNewTransaction } from "@/features/transactions/hooks/use-new-transaction";
-import { useBulkDeleteAccounts } from "@/features/accounts/api/use-bulk-delete-accounts";
-import { useGetAccounts } from "@/features/accounts/api/use-get-accounts";
-import { Button } from "@/components/ui/button";
-
 import { Loader2, Plus  } from "lucide-react";
+import { useState } from "react";
+
+import { useNewTransaction } from "@/features/transactions/hooks/use-new-transaction";
+import { useBulkDeleteTransactions } from "@/features/transactions/api/use-bulk-delete-transactions";
+import { useGetTransactions } from "@/features/transactions/api/use-get-transactions";
+
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DataTable } from "@/components/data-table";
-
 import { 
     Card,
     CardContent,
@@ -17,19 +18,48 @@ import {
 } from "@/components/ui/card";
 
 import { columns } from "./columns";
+import { use } from "react";
+import { UploadButton } from "./upload-button";
+import { set } from "date-fns";
+import { ImportCard } from "./import-card";
 
+enum VARIANTS {
+    LIST = "LIST",
+    IMPORT = "IMPORT"
+};
+
+const INITIAL_IMPORT_RESULTS = {
+    data: [],
+    errors: [],
+    meta: {},
+};
 
 const TransactionsPage = () => {
+    const [variant, setVariant] = useState<VARIANTS>(VARIANTS.LIST);
+    const [importResults, setImportResults] = useState
+    (INITIAL_IMPORT_RESULTS);
+
+    const onUpload = (results: typeof INITIAL_IMPORT_RESULTS) => {
+        console.log({ results});
+        setImportResults(results);
+        setVariant(VARIANTS.IMPORT)
+    };
+
+    const onCancelImport = () => {
+        setImportResults(INITIAL_IMPORT_RESULTS);
+        setVariant(VARIANTS.LIST);
+    }
+
     const newTransaction = useNewTransaction();
-    const deleteAccounts = useBulkDeleteAccounts();
-    const accountsQuery = useGetAccounts();
-    const accounts = accountsQuery.data || [];
+    const deleteTransactions = useBulkDeleteTransactions();
+    const transactionsQuery = useGetTransactions();
+    const transactions = transactionsQuery.data || [];
 
     const isDisabled = 
-        accountsQuery.isLoading ||
-        deleteAccounts.isPending;
+        transactionsQuery.isLoading ||
+        deleteTransactions.isPending;
 
-    if (accountsQuery.isLoading) {
+    if (transactionsQuery.isLoading) {
         return (
             <div className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24">
                 <Card className="border-none drop-shadow-sm">
@@ -46,6 +76,19 @@ const TransactionsPage = () => {
         )
     }
 
+    if (variant === VARIANTS.IMPORT) {
+        return (
+            <>
+               <ImportCard
+                    data={importResults.data}
+                    onCancel={onCancelImport}
+                    onSubmit={() => {}}
+                />
+            </>
+        )
+    }
+
+
     return (
         <div className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24">
             <Card className="border-none drop-shadow-sm">
@@ -53,19 +96,26 @@ const TransactionsPage = () => {
                     <CardTitle className="text-xl line-clamp-1">
                         Transaction History
                     </CardTitle>
-                    <Button onClick={newTransaction.onOpen} size="sm">
-                        <Plus className="size-4 mr-2" />
-                        Add new
-                    </Button>
+                    <div className="flex flex-col lg:flex-row gap-y-2 items-center gap-x-2">
+                        <Button 
+                            onClick={newTransaction.onOpen}
+                            size="sm"
+                            className="w-full lg:w-auto"
+                        >
+                            <Plus className="size-4 mr-2" />
+                            Add new
+                        </Button>
+                        <UploadButton onUpload={onUpload} />
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <DataTable
                         filterKey="name"
                         columns={columns}
-                        data={accounts}
+                        data={transactions}
                         onDelete={(row) => {
                             const ids = row.map((r) => r.original.id);
-                            deleteAccounts.mutate({ ids });
+                            deleteTransactions.mutate({ ids });
                         }}
                         disabled={isDisabled}
                     />
