@@ -6,7 +6,7 @@ import { useOpenTransaction } from "@/features/transactions/hooks/use-open-trans
 import { useGetTransaction} from "@/features/transactions/api/use-get-transaction";
 import { useEditTransaction } from "../api/use-edit-transaction";
 import { useDeleteTransaction } from "../api/use-delete-transaction";
-import { useConfirm } from "@/hooks/user-confirm";
+import { useConfirm } from "@/hooks/use-confirm";
 
 import { insertTransactionSchema } from "@/db/schema";
 import { TransactionForm } from "@/features/transactions/components/transaction-form";
