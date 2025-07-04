@@ -6,7 +6,7 @@ import { useOpenAccount } from "@/features/accounts/hooks/user-open-account";
 import { useGetAccount } from "@/features/accounts/api/use-get-account";
 import { useEditAccount } from "@/features/accounts/api/use-edit-account";
 import { useDeleteAccount } from "@/features/accounts/api/use-delete-account";
-import { useConfirm } from "@/hooks/user-confirm";
+import { useConfirm } from "@/hooks/use-confirm";
 
 import { insertAccountSchema } from "@/db/schema";
 import {
