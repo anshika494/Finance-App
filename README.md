@@ -70,6 +70,9 @@ A modern, full-stack personal finance management application built with Next.js,
    
    # Run migrations
    npm run db:migrate
+   
+   # Seed database with sample data (optional)
+   npm run db:seed
    ```
 
 5. **Start the development server**
@@ -135,6 +138,7 @@ finance-app/
 - `npm run lint` - Run ESLint
 - `npm run db:generate` - Generate database migrations
 - `npm run db:migrate` - Run database migrations
+- `npm run db:seed` - Seed database with sample data
 - `npm run db:studio` - Open Drizzle Studio
 
 ## 🎨 UI Components
