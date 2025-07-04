@@ -5,7 +5,7 @@ import { Edit, MoreHorizontal, Trash } from "lucide-react";
 import { useOpenAccount } from "@/features/accounts/hooks/user-open-account";
 import { useDeleteAccount } from "@/features/accounts/api/use-delete-account";
 
-import { useConfirm } from "@/hooks/user-confirm";
+import { useConfirm } from "@/hooks/use-confirm";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
