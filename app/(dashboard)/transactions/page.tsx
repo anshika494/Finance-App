@@ -1,11 +1,11 @@
 "use client";
 
-import { useNewAccount } from "@/features/accounts/hooks/use-new-account";
+import { useNewTransaction } from "@/features/transactions/hooks/use-new-transaction";
 import { useBulkDeleteAccounts } from "@/features/accounts/api/use-bulk-delete-accounts";
 import { useGetAccounts } from "@/features/accounts/api/use-get-accounts";
 import { Button } from "@/components/ui/button";
 
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus  } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DataTable } from "@/components/data-table";
 
@@ -19,8 +19,8 @@ import {
 import { columns } from "./columns";
 
 
-const AccountsPage = () => {
-    const newAccount = useNewAccount();
+const TransactionsPage = () => {
+    const newTransaction = useNewTransaction();
     const deleteAccounts = useBulkDeleteAccounts();
     const accountsQuery = useGetAccounts();
     const accounts = accountsQuery.data || [];
@@ -51,9 +51,9 @@ const AccountsPage = () => {
             <Card className="border-none drop-shadow-sm">
                 <CardHeader className="gap-y-2 lg:flex-row lg:items-center lg: justify-between">
                     <CardTitle className="text-xl line-clamp-1">
-                        Accounts page
+                        Transaction History
                     </CardTitle>
-                    <Button onClick={newAccount.onOpen} size="sm">
+                    <Button onClick={newTransaction.onOpen} size="sm">
                         <Plus className="size-4 mr-2" />
                         Add new
                     </Button>
@@ -75,4 +75,4 @@ const AccountsPage = () => {
     );
 };
 
-export default AccountsPage;
+export default TransactionsPage;
