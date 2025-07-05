@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 
 import { Actions } from "./actions";
-import { parse } from "path"
 import { AccountColumn } from "./account-column";
 import { CategoryColumn } from "./category-column"
 

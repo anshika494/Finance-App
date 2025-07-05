@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { format, parse } from "date-fns";
-import { 
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 
 import { useState } from "react";
@@ -14,131 +14,119 @@ import { convertAmountToMiliunits } from "@/lib/utils";
 const dateFormat = "yyyy-MM-dd HH:mm:ss";
 const outputFormat = "yyyy-MM-dd";
 
-const requiredOptions = [
-    "amount",
-    "date",
-    "payee",
-];
+const requiredOptions = ["amount", "date", "payee"];
 
-interface SelectedColumnsState  {
-    [key: string]: string | null;
+interface SelectedColumnsState {
+  [key: string]: string | null;
 }
 
-type Props = {
-    data: string[][];
-    onCancel: () => void;
-    onSubmit: (data: any) => void;
+type TransactionRow = {
+  amount: number;
+  date: string;
+  payee?: string;
+  [key: string]: string | number | undefined;
 };
 
-export const ImportCard = ({
-    data,
-    onCancel,
-    onSubmit,
-}: Props) => {
-    const [selectedColumns, setSelectedColumns] = useState<SelectedColumnsState>({});
+type Props = {
+  data: string[][];
+  onCancel: () => void;
+  onSubmit: (data: TransactionRow[]) => void;
+};
 
-    const headers = data[0];
-    const body = data.slice(1);
+export const ImportCard = ({ data, onCancel, onSubmit }: Props) => {
+  const [selectedColumns, setSelectedColumns] = useState<SelectedColumnsState>({});
 
-    const onTableHeadSelectChange = (
-        columnIndex: number,
-        value: string | null
-    ) => {
-        setSelectedColumns((prev) => {
-            const newSelectedColumns = {...prev};
+  const headers = data[0];
+  const body = data.slice(1);
 
-            for (const key in newSelectedColumns) {
-                if (newSelectedColumns[key] === value) {
-                    newSelectedColumns[key] = null;
-                }
-            }
+  const onTableHeadSelectChange = (columnIndex: number, value: string | null) => {
+    setSelectedColumns((prev) => {
+      const newSelectedColumns = { ...prev };
 
-            if (value === "skip") {
-                value = null;
-            }
+      for (const key in newSelectedColumns) {
+        if (newSelectedColumns[key] === value) {
+          newSelectedColumns[key] = null;
+        }
+      }
 
-            newSelectedColumns[`column_${columnIndex}`] = value;
-            return newSelectedColumns;
-        });
-    };
+      if (value === "skip") {
+        value = null;
+      }
 
-    const progress = Object.values(selectedColumns).filter(Boolean).length;
+      newSelectedColumns[`column_${columnIndex}`] = value;
+      return newSelectedColumns;
+    });
+  };
 
-   const handleContinue = () => {
-    const getColumnIndex = (column: string) => {
-        return column.split("_")[1];
-    };
+  const progress = Object.values(selectedColumns).filter(Boolean).length;
+
+  const handleContinue = () => {
+    const getColumnIndex = (column: string) => column.split("_")[1];
 
     const mappedData = {
-        headers: headers.map((_header, index) => {
+      headers: headers.map((_header, index) => {
+        const columnIndex = getColumnIndex(`column_${index}`);
+        return selectedColumns[`column_${columnIndex}`];
+      }),
+      body: body
+        .map((row) => {
+          const transformedRow = row.map((cell, index) => {
             const columnIndex = getColumnIndex(`column_${index}`);
-            return selectedColumns[`column_${columnIndex}`] || null;
-        }),
-        body: body.map((row) => {
-            const transformedRow = row.map((cell, index) => {
-                const columnIndex = getColumnIndex(`column_${index}`);
-                return selectedColumns[`column_${columnIndex}`] ? cell : null;
-            });
-
-            return transformedRow.every((item) => item === null)
-                ? []
-                : transformedRow;
-        }).filter((row) => row.length > 0),
+            return selectedColumns[`column_${columnIndex}`] ? cell : null;
+          });
+          return transformedRow.every((item) => item === null) ? [] : transformedRow;
+        })
+        .filter((row) => row.length > 0),
     };
+
     const arrayOfData = mappedData.body.map((row) => {
-        return row.reduce((acc: any, cell, index) => {
-            const header = mappedData.headers[index];
-            if (header !== null) {
-                acc[header] = cell;
-            }
-            return acc;
-        }, {});
+      const record: Record<string, string> = {};
+      row.forEach((cell, index) => {
+        const header = mappedData.headers[index];
+        if (cell !== null && typeof header === "string") {
+          record[header] = cell;
+        }
+      });
+      return record;
     });
-    
-    const formattedData = arrayOfData.map((item) => ({
-        ...item,
-        amount: convertAmountToMiliunits(parseFloat(item.amount)),
-        date: format(parse(item.date, dateFormat, new Date() ), outputFormat)
+
+    const formattedData: TransactionRow[] = arrayOfData.map((item) => ({
+      ...item,
+      amount: convertAmountToMiliunits(parseFloat(item.amount)),
+      date: format(parse(item.date, dateFormat, new Date()), outputFormat),
     }));
 
     onSubmit(formattedData);
-};
+  };
 
-    return ( 
-        <div className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24">
-            <Card className="border-none drop-shadow-sm">
-                <CardHeader className="gap-y-2 lg:flex-row lg:items-center lg: justify-between">
-                    <CardTitle className="text-xl line-clamp-1">
-                        Import Transaction
-                    </CardTitle>
-                    <div className="flex flex-col lg:flex-row gap-y-2 items-center gap-x-2">
-                        <Button 
-                            onClick={onCancel}
-                            size="sm"
-                            className="w-full lg:w-auto"
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            size="sm"
-                            disabled={progress < requiredOptions.length}
-                            onClick={handleContinue}
-                            className="w-full lg:w-auto"
-                        >
-                            Continue ({progress} / {requiredOptions.length})
-                        </Button>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <ImportTable
-                        headers={headers}
-                        body={body}
-                        selectedColumns={selectedColumns}
-                        onTableHeadSelectChange={onTableHeadSelectChange}
-                    />
-
-                </CardContent>
-            </Card>
-        </div>
+  return (
+    <div className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24">
+      <Card className="border-none drop-shadow-sm">
+        <CardHeader className="gap-y-2 lg:flex-row lg:items-center lg: justify-between">
+          <CardTitle className="text-xl line-clamp-1">Import Transaction</CardTitle>
+          <div className="flex flex-col lg:flex-row gap-y-2 items-center gap-x-2">
+            <Button onClick={onCancel} size="sm" className="w-full lg:w-auto">
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              disabled={progress < requiredOptions.length}
+              onClick={handleContinue}
+              className="w-full lg:w-auto"
+            >
+              Continue ({progress} / {requiredOptions.length})
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <ImportTable
+            headers={headers}
+            body={body}
+            selectedColumns={selectedColumns}
+            onTableHeadSelectChange={onTableHeadSelectChange}
+          />
+        </CardContent>
+      </Card>
+    </div>
   );
 };

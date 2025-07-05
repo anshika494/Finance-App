@@ -1,9 +1,8 @@
 import z from "zod";
 import { Hono } from "hono";
-import { subDays, parse, differenceInDays, sub} from "date-fns";
+import { subDays, parse, differenceInDays } from "date-fns";
 import { zValidator } from "@hono/zod-validator";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
-import { start } from "repl";
 import { db } from "@/db/drizzle";
 import { and, desc, eq, gte, lt, lte, sql, sum } from "drizzle-orm";
 import { accounts, categories, transactions } from "@/db/schema";
@@ -92,11 +91,6 @@ const app = new Hono()
             const expensesChange = calculatePercentageChange(
                 currentPeriod.expenses,
                 lastPeriod.expenses,
-            );
-
-            const remainingChange = calculatePercentageChange(
-                currentPeriod.remaining,
-                lastPeriod.remaining,
             );
 
             const category = await db

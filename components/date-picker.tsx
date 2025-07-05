@@ -1,13 +1,12 @@
 import * as React from "react";
 import { format } from "date-fns";
-import { Calendar as CalenderIcon} from "lucide-react";
+import { Calendar as CalenderIcon } from "lucide-react";
 import { SelectSingleEventHandler } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { on } from "events";
 
 type Props = {
     value: Date;
@@ -33,7 +32,7 @@ export const DatePicker = ({
                     )}
                 >
                     <CalenderIcon className="size-4 mr-2" />
-                    {value ? format(value, "PPP") : <span>"Pick a date"</span>}
+                    {value ? format(value, "PPP") : <span>Pick a date</span>}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="p-0">

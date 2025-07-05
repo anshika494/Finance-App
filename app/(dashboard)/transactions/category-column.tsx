@@ -3,7 +3,6 @@ import { useOpenCategory } from "@/features/categories/hooks/use-open-category";
 
 import { cn } from "@/lib/utils";
 import { useOpenTransaction } from "@/features/transactions/hooks/use-open-transaction";
-import { transactions } from "@/db/schema";
 
 type Props = {
     id: string;

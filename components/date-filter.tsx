@@ -12,7 +12,7 @@ import {
   useSearchParams,
 } from "next/navigation";
 
-import { cn, formatDateRange } from "@/lib/utils";
+import { formatDateRange } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {

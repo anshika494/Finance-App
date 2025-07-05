@@ -8,7 +8,6 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { on } from "events";
 
 type Props = {
     value: string;
